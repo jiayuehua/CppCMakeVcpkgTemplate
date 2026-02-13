@@ -4,6 +4,10 @@ cmake_minimum_required(VERSION 3.15)
 project(Tutorial VERSION 1.0)
 include(cmake/StandardProjectSettings.cmake)
 include(cmake/PrintVariables.cmake)
+include(cmake/CompilerWarnings.cmake)
+add_library(project_warnings INTERFACE)
+set_project_warnings(project_warnings)
+
 print_variables()
 # Link this 'library' to set the c++ standard / compile-time options requested
 add_library(project_options INTERFACE)
@@ -21,7 +25,6 @@ if(CMAKE_CXX_COMPILER_ID MATCHES ".*Clang")
 endif()
 
 # Link this 'library' to use the warnings specified in CompilerWarnings.cmake
-add_library(project_warnings INTERFACE)
 
 # enable cache system
 #include(cmake/Cache.cmake)
