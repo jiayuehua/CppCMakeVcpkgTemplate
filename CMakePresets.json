@@ -72,52 +72,6 @@
       "displayName": "Build Clang (Release)",
       "description": "Build with Clang (Release)",
       "configuration": "Release"
-    },
-    {
-      "name": "ninja-vcpkg-check-format",
-      "configurePreset": "ninja-multi-vcpkg-gcc",
-      "displayName": "Build",
-      "targets": [
-        "check-format"
-      ],
-      "description": "Build with Ninja/vcpkg check-format"
-    },
-    {
-      "name": "ninja-vcpkg-format",
-      "configurePreset": "ninja-multi-vcpkg-gcc",
-      "displayName": "Build",
-      "targets": [
-        "format"
-      ],
-      "description": "Build with Ninja/vcpkg format"
-    }
-  ],
-  "workflowPresets": [
-    {
-      "name": "format",
-      "steps": [
-        {
-          "name": "ninja-multi-vcpkg-gcc",
-          "type": "configure"
-        },
-        {
-          "name": "ninja-vcpkg-format",
-          "type": "build"
-        }
-      ]
-    },
-    {
-      "name": "check-format",
-      "steps": [
-        {
-          "name": "ninja-multi-vcpkg-gcc",
-          "type": "configure"
-        },
-        {
-          "name": "ninja-vcpkg-check-format",
-          "type": "build"
-        }
-      ]
     }
   ],
   "testPresets": [

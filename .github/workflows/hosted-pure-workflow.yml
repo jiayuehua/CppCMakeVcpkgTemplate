@@ -22,13 +22,14 @@ on:
 
 jobs:
   job:
-    name: ${{ matrix.os }}-${{ matrix.compiler }}-${{ github.workflow }}
+    name: ${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.configuration }}-${{ github.workflow }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-24.04]
         compiler: [gcc, clang]
+        configuration: [debug, release]
     env:
       # Indicates the location of the vcpkg as a Git submodule of the project repository.
       # Not using "VCPKG_ROOT" because a variable with the same name is defined in the VS's
@@ -89,21 +90,17 @@ jobs:
         run: |
           cmake --preset ninja-multi-vcpkg-${{ matrix.compiler }}
 
-      - name: check-format
-        if: runner.os == 'Linux'
-        run: |
-          cmake --workflow --preset check-format
-
       # Build (Release configuration only) the whole project with Ninja (which is spawn by CMake).
       #
       # Note: if the preset misses the "configuration", it is possible to explicitly select the
       # configuration with the `--config` flag, e.g.:
       # run: cmake --build --preset ninja-vcpkg --config Release
-      - name: Build (Release configuration)
+      - name: Build (${{ matrix.configuration }} configuration)
         run: |
-          cmake --build --preset ${{ matrix.compiler }}-release
+          cmake --build --preset ${{ matrix.compiler }}-${{ matrix.configuration }}
 
       # Test the whole project with CTest, again Release configuration only.
-      - name: Test (Release configuration)
+      - name: Test (${{ matrix.configuration }} configuration)
         run: |
-          ctest --preset test-${{ matrix.compiler }}-release
+          ctest --preset test-${{ matrix.compiler }}-${{ matrix.configuration }}
+

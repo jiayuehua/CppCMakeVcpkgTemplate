@@ -26,13 +26,14 @@ on:
 
 jobs:
   job:
-    name: ${{ matrix.os }}-${{ matrix.compiler }}-${{ github.workflow }}
+    name: ${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.configuration }}-${{ github.workflow }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-24.04]
         compiler: [gcc, clang]
+        configuration: [debug, release]
     #env:
     #
     # [OPTIONAL] Define the vcpkg's triplet
@@ -64,5 +65,5 @@ jobs:
         uses: lukka/run-cmake@v10
         with:
           configurePreset: 'ninja-multi-vcpkg-${{ matrix.compiler }}'
-          buildPreset: '${{ matrix.compiler }}-release'
-          testPreset: 'test-${{ matrix.compiler }}-release'
+          buildPreset: '${{ matrix.compiler }}-${{ matrix.configuration }}'
+          testPreset: 'test-${{ matrix.compiler }}-${{ matrix.configuration }}'
