@@ -1,35 +1,129 @@
-# CMakeLists.txt
 cmake_minimum_required(VERSION 3.15)
-project(cpp_template)
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-if(NOT APPLE)
-    # set(CMAKE_CXX_CLANG_TIDY clang-tidy)
+
+
+project(Tutorial VERSION 1.0)
+include(cmake/StandardProjectSettings.cmake)
+include(cmake/PrintVariables.cmake)
+print_variables()
+# Link this 'library' to set the c++ standard / compile-time options requested
+add_library(project_options INTERFACE)
+target_compile_features(project_options INTERFACE cxx_std_23)
+if(CMAKE_CXX_COMPILER_ID MATCHES ".*Clang")
+  set(CMAKE_EXE_LINKER_FLAGS "-fuse-ld=mold")
+  set(CMAKE_SHARED_LINKER_FLAGS "-fuse-ld=mold")
 endif()
 
-# Find dependencies provided by vcpkg (via vcpkg.cmake)
-find_package(unofficial-sqlite3 CONFIG REQUIRED)
-find_package(fmt CONFIG REQUIRED)
+if(CMAKE_CXX_COMPILER_ID MATCHES ".*Clang")
+  option(ENABLE_BUILD_WITH_TIME_TRACE "Enable -ftime-trace to generate time tracing .json files on clang" OFF)
+  if(ENABLE_BUILD_WITH_TIME_TRACE)
+    target_compile_options(project_options INTERFACE -ftime-trace)
+  endif()
+endif()
 
-set(
-    CPP_TEMPLATE_SOURCES
-    src/main.cpp
+# Link this 'library' to use the warnings specified in CompilerWarnings.cmake
+add_library(project_warnings INTERFACE)
+
+# enable cache system
+#include(cmake/Cache.cmake)
+
+
+# standard compiler warnings
+
+# sanitizer options if supported by compiler
+include(cmake/Sanitizers.cmake)
+enable_sanitizers(project_options)
+
+# enable doxygen
+include(cmake/Doxygen.cmake)
+enable_doxygen()
+
+# allow for static analysis options
+include(cmake/StaticAnalyzers.cmake)
+
+option(BUILD_SHARED_LIBS "Enable compilation of shared libraries" OFF)
+option(ENABLE_TESTING "Enable Test Builds" ON)
+option(ENABLE_FUZZING "Enable Fuzzing Builds" OFF)
+
+# Set up some extra Conan dependencies based on our needs before loading Conan
+
+
+if(ENABLE_TESTING)
+  enable_testing()
+  message("Building Tests. Be sure to check out test/constexpr_tests for constexpr testing")
+  add_subdirectory(test)
+endif()
+
+if(ENABLE_FUZZING)
+  message("Building Fuzz Tests, using fuzzing sanitizer https://www.llvm.org/docs/LibFuzzer.html")
+  add_subdirectory(fuzz_test)
+endif()
+
+add_subdirectory(src)
+
+option(ENABLE_UNITY "Enable Unity builds of projects" OFF)
+if(ENABLE_UNITY)
+  # Add for any project you want to apply unity builds for
+  set_target_properties(intro PROPERTIES UNITY_BUILD ON)
+endif()
+
+if(APPLE)
+  set(CMAKE_INSTALL_RPATH "@executable_path/../lib")
+elseif(UNIX)
+  set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib")
+endif()
+
+# configure a header file to pass the version number only
+configure_file(TutorialConfig.h.in TutorialConfig.h)
+# add the MathFunctions library
+add_subdirectory(MathFunctions)
+add_subdirectory(TutorialDir)
+
+
+# add the install targets
+install(TARGETS Tutorial DESTINATION bin)
+install(FILES "${PROJECT_BINARY_DIR}/TutorialConfig.h"
+  DESTINATION include
+  )
+
+
+include(InstallRequiredSystemLibraries)
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/License.txt")
+set(CPACK_PACKAGE_VERSION_MAJOR "${Tutorial_VERSION_MAJOR}")
+set(CPACK_PACKAGE_VERSION_MINOR "${Tutorial_VERSION_MINOR}")
+include(CPack)
+
+# install the configuration targets
+install(EXPORT MathFunctionsTargets
+  FILE MathFunctionsTargets.cmake
+  DESTINATION lib/cmake/MathFunctions
 )
-set(
-    CPP_TEMPLATE_TEST_SOURCES
-    src/test.cpp
+
+include(CMakePackageConfigHelpers)
+# generate the config file that is includes the exports
+configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
+  "${CMAKE_CURRENT_BINARY_DIR}/MathFunctionsConfig.cmake"
+  INSTALL_DESTINATION "lib/cmake/example"
+  NO_SET_AND_CHECK_MACRO
+  NO_CHECK_REQUIRED_COMPONENTS_MACRO
+  )
+# generate the version file for the config file
+write_basic_package_version_file(
+  "${CMAKE_CURRENT_BINARY_DIR}/MathFunctionsConfigVersion.cmake"
+  VERSION "${Tutorial_VERSION_MAJOR}.${Tutorial_VERSION_MINOR}"
+  COMPATIBILITY AnyNewerVersion
 )
 
-# main target
-add_executable(main ${CPP_TEMPLATE_SOURCES})
-target_link_libraries(main PRIVATE unofficial::sqlite3::sqlite3 fmt::fmt-header-only)
-set_property(TARGET main PROPERTY CXX_STANDARD 23)
+# install the configuration file
+install(FILES
+  ${CMAKE_CURRENT_BINARY_DIR}/MathFunctionsConfig.cmake
+  DESTINATION lib/cmake/MathFunctions
+  )
 
-# tests target
-add_executable(tests ${CPP_TEMPLATE_TEST_SOURCES})
-target_link_libraries(tests PRIVATE unofficial::sqlite3::sqlite3 fmt::fmt-header-only)
-set_property(TARGET tests PROPERTY CXX_STANDARD 23)
-enable_testing()
-add_test(tests tests)
+# generate the export targets for the build tree
+# needs to be after the install(TARGETS ) command
+export(EXPORT MathFunctionsTargets
+  FILE "${CMAKE_CURRENT_BINARY_DIR}/MathFunctionsTargets.cmake"
+)
 
 add_custom_target(
     check-format
