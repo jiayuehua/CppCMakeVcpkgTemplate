@@ -81,6 +81,15 @@
       "hidden": true
     },
     {
+      "name": "ninja-vcpkg-check-format",
+      "configurePreset": "ninja-multi-vcpkg",
+      "displayName": "Build",
+      "targets": [
+        "check-format"
+      ],
+      "description": "Build with Ninja/vcpkg check-format"
+    },
+    {
       "name": "ninja-vcpkg-format",
       "configurePreset": "ninja-multi-vcpkg",
       "displayName": "Build",
@@ -88,6 +97,34 @@
         "format"
       ],
       "description": "Build with Ninja/vcpkg format"
+    }
+  ],
+  "workflowPresets": [
+    {
+      "name": "format",
+      "steps": [
+        {
+          "name": "ninja-multi-vcpkg-gcc",
+          "type": "configure"
+        },
+        {
+          "name": "ninja-vcpkg-format",
+          "type": "build"
+        }
+      ]
+    },
+    {
+      "name": "check-format",
+      "steps": [
+        {
+          "name": "ninja-multi-vcpkg-gcc",
+          "type": "configure"
+        },
+        {
+          "name": "ninja-vcpkg-check-format",
+          "type": "build"
+        }
+      ]
     }
   ],
   "testPresets": [

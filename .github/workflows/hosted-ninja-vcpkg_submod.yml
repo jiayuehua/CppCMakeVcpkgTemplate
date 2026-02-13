@@ -26,12 +26,13 @@ on:
 
 jobs:
   job:
-    name: ${{ matrix.os }}-${{ github.workflow }}
+    name: ${{ matrix.os }}-${{ matrix.compiler }}-${{ github.workflow }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-24.04]
+        compiler: [gcc, clang]
     #env:
     #
     # [OPTIONAL] Define the vcpkg's triplet
@@ -62,6 +63,6 @@ jobs:
       - name: Run CMake+vcpkg+Ninja+CTest to build packages and generate/build/test the code.
         uses: lukka/run-cmake@v10
         with:
-          configurePreset: 'ninja-multi-vcpkg'
-          buildPreset: 'ninja-vcpkg-release'
-          testPreset: 'test-release'
+          configurePreset: 'ninja-multi-vcpkg-${{ matrix.compiler }}'
+          buildPreset: '${{ matrix.compiler }}-release'
+          testPreset: 'test-${{ matrix.compiler }}-release'
