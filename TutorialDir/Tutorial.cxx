@@ -11,17 +11,16 @@ const int hello = 40 + initial();
 
 int main(int argc, char *argv[])
 {
-  std::cout << "hello\n";
-  argc += 2;
-  std::cout << "argc" << argc << std::endl;
-  argc += 2;
-  std::cout << "argc" << argc << std::endl;
-  std::cout << "hello\n";
+
+
   if (argc < 2) {
-    //std::cout << argv[0] << " Version " << Tutorial_VERSION_MAJOR << "." << Tutorial_VERSION_MINOR << std::endl;
+    // std::cout << argv[0] << " Version " << Tutorial_VERSION_MAJOR << "." << Tutorial_VERSION_MINOR << std::endl;
+
     std::cout << "Usage: " << argv[0] << " number" << std::endl;
+
     return 1;
   }
+  std::cout << "helloC\n";
 
   // convert input to double
   const double inputValue = std::stod(argv[1]);

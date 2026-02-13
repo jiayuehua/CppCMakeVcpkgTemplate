@@ -59,32 +59,20 @@ function(set_project_warnings project_name)
   set(CLANG_WARNINGS
   -Wall
   -Wcast-align
-  -Wcast-align
   -Wcast-qual
   -Wconversion
-  -Wconversion
   -Wdouble-promotion
-  -Wdouble-promotion
-  -Wduplicated-cond
   -Wextra
   -Wfloat-equal
   -Wformat=2
-  -Wlogical-op
   -Wnon-virtual-dtor
-  -Wnon-virtual-dtor
-  -Wnull-dereference
   -Wnull-dereference
   -Wold-style-cast
   -Woverloaded-virtual
   -Wpedantic
-  -Wpedantic
-  -Wrestrict
   -Wshadow
   -Wsign-conversion
-  -Wsign-conversion
   -Wunused
-  -Wunused
-  -Wuseless-cast
   )
 
   if(MSVC)
