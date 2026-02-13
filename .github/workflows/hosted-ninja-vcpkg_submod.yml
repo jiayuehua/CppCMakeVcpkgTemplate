@@ -26,7 +26,7 @@ on:
 
 jobs:
   job:
-    name: ${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.configuration }}-${{ github.workflow }}
+    name: ${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.configuration }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
