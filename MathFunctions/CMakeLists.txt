@@ -14,7 +14,7 @@ set_property(TARGET MathFunctions PROPERTY SOVERSION "1")
 # should we use our own math functions
 #target_link_libraries(MathFunctions INTERFACE tutorial_compiler_flags)
 
-target_link_libraries(MathFunctions PRIVATE project_options project_warnings)
+target_link_libraries(MathFunctions PUBLIC project_options project_warnings)
 
 # define the symbol stating we are using the declspec(dllexport) when
 #building on windows
