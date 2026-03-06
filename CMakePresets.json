@@ -30,6 +30,20 @@
       }
     },
     {
+      "name": "ninja-multi-vcpkg-llamacc",
+      "displayName": "Ninja Multi-Config (LLAMACC)",
+      "description": "Configure with vcpkg toolchain and llamacc compiler",
+      "inherits": "ninja-multi-vcpkg",
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "/home/rob/go/bin/llamacc",
+        "CMAKE_CXX_COMPILER": "/home/rob/go/bin/llamac++"
+      },
+      "environment": {
+        "CC": "llamacc",
+        "CXX": "llamac++"
+      }
+    },
+    {
       "name": "ninja-multi-vcpkg-clang",
       "displayName": "Ninja Multi-Config (Clang)",
       "description": "Configure with vcpkg toolchain and Clang compiler",
@@ -45,6 +59,20 @@
     }
   ],
   "buildPresets": [
+    {
+      "name": "llamacc-debug",
+      "configurePreset": "ninja-multi-vcpkg-llamacc",
+      "displayName": "Build LLAMACC (Debug)",
+      "description": "Build with LLAMACC (Debug)",
+      "configuration": "Debug"
+    },
+    {
+      "name": "llamacc-release",
+      "configurePreset": "ninja-multi-vcpkg-llamacc",
+      "displayName": "Build LLAMACC (Release)",
+      "description": "Build with LLAMACC (Release)",
+      "configuration": "Release"
+    },
     {
       "name": "gcc-debug",
       "configurePreset": "ninja-multi-vcpkg-gcc",
@@ -101,6 +129,20 @@
       "description": "Test Clang (Release)",
       "displayName": "Test Clang (Release)",
       "configurePreset": "ninja-multi-vcpkg-clang",
+      "configuration": "Release"
+    },
+    {
+      "name": "test-llamacc-debug",
+      "description": "Test LLAMACC (Debug)",
+      "displayName": "Test LLAMACC (Debug)",
+      "configurePreset": "ninja-multi-vcpkg-llamacc",
+      "configuration": "Debug"
+    },
+    {
+      "name": "test-llamacc-release",
+      "description": "Test LLAMACC (Release)",
+      "displayName": "Test LLAMACC (Release)",
+      "configurePreset": "ninja-multi-vcpkg-llamacc",
       "configuration": "Release"
     }
   ]
