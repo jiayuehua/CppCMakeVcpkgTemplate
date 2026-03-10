@@ -1,0 +1,87 @@
+# Copyright (c) 2021-2022-2023-2024 Luca Cappa
+# Released under the term specified in file LICENSE.txt
+# SPDX short identifier: MIT
+
+name: Release
+on:
+  push:
+    tags:
+      - 'v*.*.*'  # Triggers on version tags like v1.0.0
+
+jobs:
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-24.04
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+    steps:
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+  build-and-package:
+    name: Build and Package - ${{ matrix.os }}-${{ matrix.compiler }}
+    needs: create-release
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04]
+        compiler: [gcc, clang]
+        configuration: [release]
+    
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - uses: lukka/get-cmake@latest
+
+      - name: Install Ninja
+        uses: seanmiddleditch/gha-setup-ninja@master
+        with:
+          version: latest
+
+      - name: Restore from cache and setup vcpkg executable and data files
+        uses: lukka/run-vcpkg@v11
+        with:
+          vcpkgJsonGlob: 'vcpkg.json'
+
+      - name: Run CMake+vcpkg+Ninja to build
+        uses: lukka/run-cmake@v10
+        with:
+          configurePreset: 'ninja-multi-vcpkg-${{ matrix.compiler }}'
+          buildPreset: '${{ matrix.compiler }}-${{ matrix.configuration }}'
+
+      - name: Create CPack packages
+        run: |
+          cd builds/ninja-multi-vcpkg-${{ matrix.compiler }}
+          cpack -C Release -G "TGZ;DEB"
+        shell: bash
+
+      - name: Upload TGZ package
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: ./builds/ninja-multi-vcpkg-${{ matrix.compiler }}/Tutorial-1.0-Linux.tar.gz
+          asset_name: Tutorial-${{ matrix.compiler }}-1.0-Linux.tar.gz
+          asset_content_type: application/gzip
+
+      - name: Upload DEB package
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: ./builds/ninja-multi-vcpkg-${{ matrix.compiler }}/Tutorial-1.0-Linux.deb
+          asset_name: Tutorial-${{ matrix.compiler }}-1.0-Linux.deb
+          asset_content_type: application/vnd.debian.binary-package

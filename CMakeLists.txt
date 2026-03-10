@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 
-
-project(Tutorial VERSION 1.0)
+project(Tutorial VERSION 1.0.0)
 include(cmake/StandardProjectSettings.cmake)
 include(cmake/PrintVariables.cmake)
 include(cmake/CompilerWarnings.cmake)
@@ -94,9 +93,13 @@ install(FILES "${PROJECT_BINARY_DIR}/TutorialConfig.h"
 
 
 include(InstallRequiredSystemLibraries)
-set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/License.txt")
-set(CPACK_PACKAGE_VERSION_MAJOR "${Tutorial_VERSION_MAJOR}")
-set(CPACK_PACKAGE_VERSION_MINOR "${Tutorial_VERSION_MINOR}")
+set(CPACK_PACKAGE_NAME "${PROJECT_NAME}")
+set(CPACK_PACKAGE_VENDOR "MyCompany")
+set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "this is a demo project")
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
+set(CPACK_PACKAGE_VERSION_MAJOR "${PROJECT_VERSION_MAJOR}")
+set(CPACK_PACKAGE_VERSION_MINOR "${PROJECT_VERSION_MINOR}")
 include(CPack)
 
 # install the configuration targets
