@@ -19,7 +19,6 @@
       "vendor": {
         "microsoft.com/VisualStudioRemoteSettings/CMake/2.0": {
           "sourceDir": "${sourceDir}",
-          "remoteSourceRootDir": "/mnt/d/source/CppCMakeVcpkgTemplaterepos",
           "forceWSL1Toolset": true,
           "copySources": false
         }
