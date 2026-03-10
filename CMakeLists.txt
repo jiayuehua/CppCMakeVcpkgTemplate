@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 
-project(Tutorial VERSION 1.0.0)
+project(Tutorial VERSION 1.0.4)
 include(cmake/StandardProjectSettings.cmake)
 include(cmake/PrintVariables.cmake)
 include(cmake/CompilerWarnings.cmake)
