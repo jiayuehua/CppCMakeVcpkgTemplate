@@ -3,6 +3,10 @@
 # SPDX short identifier: MIT
 
 name: Release
+
+permissions:
+  contents: write
+
 on:
   push:
     tags:
@@ -14,15 +18,23 @@ jobs:
     runs-on: ubuntu-24.04
     outputs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
+      version: ${{ steps.get_version.outputs.VERSION }}
+      version_number: ${{ steps.get_version.outputs.VERSION_NUMBER }}
     steps:
+      - name: Get tag name
+        id: get_version
+        run: |
+          echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          echo "VERSION_NUMBER=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          tag_name: ${{ steps.get_version.outputs.VERSION }}
+          release_name: Release ${{ steps.get_version.outputs.VERSION }}
           draft: false
           prerelease: false
 
@@ -72,8 +84,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: ./builds/ninja-multi-vcpkg-${{ matrix.compiler }}/Tutorial-1.0-Linux.tar.gz
-          asset_name: Tutorial-${{ matrix.compiler }}-1.0-Linux.tar.gz
+          asset_path: ./builds/ninja-multi-vcpkg-${{ matrix.compiler }}/Tutorial-${{ needs.create-release.outputs.version_number }}-Linux.tar.gz
+          asset_name: Tutorial-${{ matrix.compiler }}-${{ needs.create-release.outputs.version }}-Linux.tar.gz
           asset_content_type: application/gzip
 
       - name: Upload DEB package
@@ -82,6 +94,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: ./builds/ninja-multi-vcpkg-${{ matrix.compiler }}/Tutorial-1.0-Linux.deb
-          asset_name: Tutorial-${{ matrix.compiler }}-1.0-Linux.deb
+          asset_path: ./builds/ninja-multi-vcpkg-${{ matrix.compiler }}/Tutorial-${{ needs.create-release.outputs.version_number }}-Linux.deb
+          asset_name: Tutorial-${{ matrix.compiler }}-${{ needs.create-release.outputs.version }}-Linux.deb
           asset_content_type: application/vnd.debian.binary-package
