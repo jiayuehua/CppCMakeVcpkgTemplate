@@ -8,6 +8,7 @@ add_library(project_warnings INTERFACE)
 set_project_warnings(project_warnings)
 
 print_variables()
+message(STATUS "PATH: $ENV{PATH}")
 # Link this 'library' to set the c++ standard / compile-time options requested
 add_library(project_options INTERFACE)
 target_compile_features(project_options INTERFACE cxx_std_23)
